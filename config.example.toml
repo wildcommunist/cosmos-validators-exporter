@@ -14,14 +14,14 @@ json = false
 # Per-chain config.
 [[chains]]
 # Chain name that will go into labels. Required.
-name = "bitsong"
+name = "andromeda"
 # LCD endpoint to query data from. Required.
-lcd-endpoint = "https://api.bitsong.quokkastake.io"
+lcd-endpoint = "https://andromeda-api.polkachu.com"
 # Chain's base denom.
 # This value is quite useless by itself, but it's exposed in `cosmos_validators_exporter_base_denom` metric,
 # which later can be joined with other metrics (such as, total delegated tokens)
 # and the price can be calculated based on that.
-base-denom = "ubtsg"
+base-denom = "uandr"
 # Denoms info.
 # Used to 1) be exposed as a standalone metric, and 2) when calculating metric for token price.
 # This is an an array of objects with following values:
@@ -60,7 +60,7 @@ denoms = [
 ]
 # Bech32 prefix for a wallet address (example: "cosmos" for a Cosmos wallet). If omitted,
 # the self-delegation metric will not be present.
-bech-wallet-prefix = "bitsong"
+bech-wallet-prefix = "andr"
 # List of validators to monitor.
 # Address is required, consensus-address is optional but will result in omitting
 # signing-infos metrics (like missed blocks counter).
@@ -69,7 +69,10 @@ bech-wallet-prefix = "bitsong"
 # If you are using it to track a consumer chain validator and if you are using the assigned key,
 # please make sure to use the consensus address of this chain and not the provider chain one.
 validators = [
-    { address = "bitsongvaloper14rvn7anf22e00vj5x3al4w50ns78s7n42rc0ge", consensus-address = "bitsongvalcons16ktzzs4ra4kcw668demahue52zh2xjllwdd6n3" }
+    { address = "andrvaloper1447zkp6jek5w3uth6a4gysnt2pjpclvl2yr4l4", consensus-address = "andrvalcons1hvfjjf0ld28ptp8grhpcrds584zeg8u3seeny2" },
+    { address = "andrvaloper18lv33mxg53gxmscreq5qypmt2xhfmde84feamu", consensus-address = "andrvalcons1szte4pjxgupwkaj23k09e8szyqe6uly3q4kzzg" },
+    { address = "andrvaloper1pqr078gzr9jlutews3s9sxvzkuhd0j6mszd9wu", consensus-address = "andrvalcons1tkf8359vhlp7q4kksx0sleakcavc9hzdzwrd6g" },
+    { address = "andrvaloper130m3n9zdplakayzwxhn9ngvclwczeqyeck5t4p", consensus-address = "andrvalcons1maw7yntjpx826skkn0ltamltx9dxtxp53ve359" },
 ]
 # List of queries to enable/disable.
 # If the list is not provided, or the value for query is not specified,
@@ -99,15 +102,3 @@ signing-info = true
 slashing-params = true
 # Query for chain staking params/max validators count
 staking-params = true
-
-# There can be multiple chains.
-[[chains]]
-name = "emoney"
-lcd-endpoint = "https://api.emoney.quokkastake.io"
-base-denom = "ungm"
-denoms = [
-    { denom = "ungm", display-denom = "ngm", coingecko-currency = "emoney" }
-]
-validators = [
-    { address = "emoneyvaloper1jk4n79c5gv36972ptnly3rvx5nvn3hl3hgly9g" }
-]

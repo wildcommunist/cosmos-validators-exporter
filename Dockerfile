@@ -1,5 +1,7 @@
 FROM golang:1.20-bullseye as base
 ARG APP_BUID_VERSION
+ARG CI_COMMIT_SHA
+ARG APP_GIT_HASH
 RUN adduser \
   --disabled-password \
   --gecos "" \
@@ -18,7 +20,7 @@ COPY . .
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
-ENV LDFLAGS="-X main.version=${APP_BUID_VERSION}"
+ENV LDFLAGS="-X main.version=${APP_BUID_VERSION} -X main.commit=${APP_GIT_HASH} -X main.hash=${CI_COMMIT_SHA}"
 RUN go build -ldflags="${LDFLAGS}"  -o /exporter cmd/cosmos-validators-exporter.go
 
 FROM scratch

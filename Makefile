@@ -18,6 +18,7 @@ docker_build :
 	docker build \
 		-t ${DOCKER_USERNAME}/${APPLICATION_NAME}:${GIT_HASH} \
 		--build-arg APP_BUID_VERSION=${VERSION} \
+		--build-arg APP_GIT_HASH=${GIT_HASH} \
 		--build-arg CI_COMMIT_SHA=${CI_COMMIT_SHA} \
 		.
 

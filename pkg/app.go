@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	coingeckoPkg "main/pkg/price_fetchers/coingecko"
 	dexScreenerPkg "main/pkg/price_fetchers/dex_screener"
 	"main/pkg/types"
@@ -22,6 +23,7 @@ type (
 	AppPayload struct {
 		Version string `json:"version"`
 		Commit  string `json:"commit"`
+		Hash    string `json:"hash"`
 	}
 
 	App struct {
@@ -92,8 +94,23 @@ func (a *App) BaseHandler(w http.ResponseWriter, r *http.Request) {
 		Str("request-id", uuid.New().String()).
 		Logger()
 	sublogger.Info().Msg("Serving homepage.")
+
+	var chains []string
+	for _, c := range a.Config.Chains {
+		chains = append(chains, fmt.Sprintf("%s:%s", c.Name, c.BaseDenom))
+	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`ALL GOOD ON THE WESTERN FROM`))
+	w.Write([]byte(fmt.Sprintf(
+		"Build version: %s\nCommit: %s\nHash: %s\n\n"+
+			"Number of chains: %d (%v)\n\n"+
+			"<a href=\"/metrics\">View metrics</a>",
+		a.Payload.Version,
+		a.Payload.Commit,
+		a.Payload.Hash,
+		len(chains),
+		chains,
+	)))
 }
 
 func (a *App) Handler(w http.ResponseWriter, r *http.Request) {

@@ -10,12 +10,14 @@ import (
 var (
 	version = "unknown"
 	commit  = "unknown"
+	hash    = "unknown"
 )
 
 func Execute(configPath string) {
 	payload := pkg.AppPayload{
 		Version: version,
 		Commit:  commit,
+		Hash:    hash,
 	}
 	app := pkg.NewApp(configPath, payload)
 	app.Start()
