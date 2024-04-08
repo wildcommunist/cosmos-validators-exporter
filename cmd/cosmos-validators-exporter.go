@@ -9,10 +9,15 @@ import (
 
 var (
 	version = "unknown"
+	commit  = "unknown"
 )
 
 func Execute(configPath string) {
-	app := pkg.NewApp(configPath)
+	payload := pkg.AppPayload{
+		Version: version,
+		Commit:  commit,
+	}
+	app := pkg.NewApp(configPath, payload)
 	app.Start()
 }
 

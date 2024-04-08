@@ -18,13 +18,21 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type App struct {
-	Config   *config.Config
-	Logger   *zerolog.Logger
-	Queriers []types.Querier
-}
+type (
+	AppPayload struct {
+		Version string `json:"version"`
+		Commit  string `json:"commit"`
+	}
 
-func NewApp(configPath string) *App {
+	App struct {
+		Payload  *AppPayload
+		Config   *config.Config
+		Logger   *zerolog.Logger
+		Queriers []types.Querier
+	}
+)
+
+func NewApp(configPath string, payload AppPayload) *App {
 	appConfig, err := config.GetConfig(configPath)
 	if err != nil {
 		loggerPkg.GetDefaultLogger().Fatal().Err(err).Msg("Could not load config")
@@ -56,6 +64,7 @@ func NewApp(configPath string) *App {
 	}
 
 	return &App{
+		Payload:  &payload,
 		Logger:   logger,
 		Config:   appConfig,
 		Queriers: queriers,
@@ -63,6 +72,10 @@ func NewApp(configPath string) *App {
 }
 
 func (a *App) Start() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		a.BaseHandler(w, r)
+	})
+
 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
 		a.Handler(w, r)
 	})
@@ -72,6 +85,15 @@ func (a *App) Start() {
 	if err != nil {
 		a.Logger.Fatal().Err(err).Msg("Could not start application")
 	}
+}
+
+func (a *App) BaseHandler(w http.ResponseWriter, r *http.Request) {
+	sublogger := a.Logger.With().
+		Str("request-id", uuid.New().String()).
+		Logger()
+	sublogger.Info().Msg("Serving homepage.")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`ALL GOOD ON THE WESTERN FROM`))
 }
 
 func (a *App) Handler(w http.ResponseWriter, r *http.Request) {
