@@ -61,6 +61,7 @@ func (q *SigningInfoQuerier) GetMetrics() ([]prometheus.Collector, []*types.Quer
 						Err(err).
 						Str("chain", chain.Name).
 						Str("address", validator.Address).
+						Str("consensus", validator.ConsensusAddress).
 						Msg("Error getting validator signing info")
 					return
 				}

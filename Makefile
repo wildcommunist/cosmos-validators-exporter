@@ -26,9 +26,9 @@ push :
 	docker push ${DOCKER_USERNAME}/${APPLICATION_NAME}:${GIT_HASH}
 
 
-release :
-	 docker pull ${DOCKER_USERNAME}/${APPLICATION_NAME}:${GIT_HASH}
+release : docker_build
 	 docker tag  ${DOCKER_USERNAME}/${APPLICATION_NAME}:${GIT_HASH} ${DOCKER_USERNAME}/${APPLICATION_NAME}:latest
+	 docker push ${DOCKER_USERNAME}/${APPLICATION_NAME}:${GIT_HASH}
 	 docker push ${DOCKER_USERNAME}/${APPLICATION_NAME}:latest
 
 build_run : docker_build run

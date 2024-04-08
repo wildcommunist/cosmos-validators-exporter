@@ -56,7 +56,7 @@ base-denom = "uandr"
 # which you can use to display a worthwhile of your unclaimed commission and use display-denom
 # label for legend.
 denoms = [
-    { denom = "uatom", display-denom = "atom", coingecko-currency = "cosmos", denom-coefficient = 1000000, dex-screener-chain-id = "osmosis", dex-screener-pair = "1" },
+    { denom = "uandr", display-denom = "andr", coingecko-currency = "andromeda-2", denom-coefficient = 1000000, dex-screener-chain-id = "osmosis", dex-screener-pair = "1" },
 ]
 # Bech32 prefix for a wallet address (example: "cosmos" for a Cosmos wallet). If omitted,
 # the self-delegation metric will not be present.
@@ -73,6 +73,97 @@ validators = [
     { address = "andrvaloper18lv33mxg53gxmscreq5qypmt2xhfmde84feamu", consensus-address = "andrvalcons1szte4pjxgupwkaj23k09e8szyqe6uly3q4kzzg" },
     { address = "andrvaloper1pqr078gzr9jlutews3s9sxvzkuhd0j6mszd9wu", consensus-address = "andrvalcons1tkf8359vhlp7q4kksx0sleakcavc9hzdzwrd6g" },
     { address = "andrvaloper130m3n9zdplakayzwxhn9ngvclwczeqyeck5t4p", consensus-address = "andrvalcons1maw7yntjpx826skkn0ltamltx9dxtxp53ve359" },
+]
+# List of queries to enable/disable.
+# If the list is not provided, or the value for query is not specified,
+# then this query will be enabled. Useful if some queries on some chains are broken or
+# do not return any meaningful value (like signing info on e-Money) or are too heavy and
+# the node can't handle such requests (like delegators count on Cosmos Hub).
+[chains.queries]
+# Query for validator info
+validator = true
+# Query for delegators count
+delegations = true
+# Query for unbonding delegations count
+unbonds = true
+# Query for self-delegated amount
+self-delegation = true
+# Query for all delegators count/ranking. Also used in total bonded tokens calculation.
+validators = true
+# Query for validator unclaimed commission
+commission = true
+# Query for validator unclaimed self-delegated rewards
+rewards = true
+# Query for validator wallet balance
+balance = true
+# Query for validator signing info
+signing-info = true
+# Query for chain slashing params/missed blocks window
+slashing-params = true
+# Query for chain staking params/max validators count
+staking-params = true
+
+# Per-chain config.
+[[chains]]
+# Chain name that will go into labels. Required.
+name = "terra"
+# LCD endpoint to query data from. Required.
+lcd-endpoint = "https://terra-api.polkachu.com"
+# Chain's base denom.
+# This value is quite useless by itself, but it's exposed in `cosmos_validators_exporter_base_denom` metric,
+# which later can be joined with other metrics (such as, total delegated tokens)
+# and the price can be calculated based on that.
+base-denom = "uluna"
+# Denoms info.
+# Used to 1) be exposed as a standalone metric, and 2) when calculating metric for token price.
+# This is an an array of objects with following values:
+# 1. coingecko-currency
+# Coingecko currency, specify it if you want to also get the wallet balance
+# in total in USD. Optional.
+# 2. dex-screener-chain-id and dex-screener-pair.
+# dexscreener.com's chain ID (usually "osmosis") and pair (usually pool ID).
+# Won't be used if coingecko-currency is provided.
+# Either coingecko-currency or these two params are required for getting token price.
+# 3. denom
+# The actual denom value (such as "uatom" for Cosmos Hub or "ibc/xxxxx" for IBC denoms). Required.
+# 4. display-denom
+# The denom that'll be returned in labels. Required.
+# 5. denom-coefficient
+# The coefficient you need to multiply base denom to to get 1 token on Coingecko/DexScreener.
+# Is exposed by `cosmos_validators_exporter_denom_coefficient` metric.
+# Optional, defaults to 1_000_000.
+# You can calculate the actual price of something by doing the following:
+# 1) taking the actual metric (either with "denom" label, like commission, or joining it with "base-denom" label
+# of `cosmos_validators_exporter_base_denom` metric for the chain, which will add the label)
+# 2) divide and join it with `cosmos_validators_exporter_denom_coefficient` metric for this chain for this denom
+# 3) multiply it with `cosmos_validators_exporter_price` metric for this denom/chain.
+# For example, with denom = "uatom", display-denom = "atom", "coingecko-currency" = "cosmos",
+# if you have 10 ATOM unclaimed commission, and $ATOM price = 10, here's what'll happen on each step:
+# 1) will return a metric with labels/values like this:
+# {chain="cosmos",address="cosmosvaloperxxxx",denom="uatom"} 10000000
+# 2) will return a metric like this
+# {chain="cosmos",address="cosmosvaloperxxxx",denom="uatom",display-denom="atom"} 10
+# 3) will return a metric like this:
+# {chain="cosmos",address="cosmosvaloperxxxx",denom="uatom",display-denom="atom"} 100
+# which you can use to display a worthwhile of your unclaimed commission and use display-denom
+# label for legend.
+denoms = [
+    { denom = "uluna", display-denom = "luna", coingecko-currency = "terra-luna-2", denom-coefficient = 1000000, dex-screener-chain-id = "osmosis", dex-screener-pair = "1" },
+]
+# Bech32 prefix for a wallet address (example: "cosmos" for a Cosmos wallet). If omitted,
+# the self-delegation metric will not be present.
+bech-wallet-prefix = "terra"
+# List of validators to monitor.
+# Address is required, consensus-address is optional but will result in omitting
+# signing-infos metrics (like missed blocks counter).
+# You can get your consensus-address by running "<appd> tendermint show-address" on your validator node,
+# if you are not using KMS solutions.
+# If you are using it to track a consumer chain validator and if you are using the assigned key,
+# please make sure to use the consensus address of this chain and not the provider chain one.
+validators = [
+    { address = "terravaloper1l920a79akuc98hz4389axf9ctcymrf5ays578x", consensus-address = "terravalcons1c28et5ewpdq8dkudmavgyejfl2emnwtt3et5zz" },
+    { address = "terravaloper1j4cc2p4f4t4m3z37gumr6cr64vm605aa4wmcyf", consensus-address = "terravalcons1jrp6hftwa20cl238qlnhkampr4hxkzsgzuek27" },
+    { address = "terravaloper1q8w4u2wyhx574m70gwe8km5za2ptanny9mnqy3", consensus-address = "terravalcons1cf986gzwpgrhxm403fl8dqsvmp59vkcwkqyeas" },
 ]
 # List of queries to enable/disable.
 # If the list is not provided, or the value for query is not specified,
